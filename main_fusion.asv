@@ -1,0 +1,20 @@
+%% finfing unified matrix
+%% cross-diffusion process to iteratively update the similiarity matrix.
+n = input('enter the number of subjects :'); % n is the number of subjects in consideration
+load('ear_features.mat');load('feature_all.mat'); load('color_feature.mat');
+[norm_1 s_matrix_1] = similiarity_face(features_training,n);
+[norm_2 s_matrix_2] = similiarity_iris(features,n);
+[norm_3 s_matrix_3] = similiarity_ear(n);
+n_mod = 3; % n_mod being the number of modalities
+% let norm_1, norm_2 etc. initial similiarity matrices;
+% s_matrix_1, s_matrix_2 etc. sparse matrices;
+for t = 1:12 % 12 is the number of itrations for cross-diffusion process
+    n_1 = norm_1; n_2 = norm_2; n_3 = norm_3;
+    norm_1 = s_matrix_1*((n_2+n_3)/(n_mod-1)) * (s_matrix_1)';
+    norm_2 = s_matrix_2*((n_1+n_3)/(n_mod-1)) * (s_matrix_2)';
+    norm_3 = s_matrix_3*((n_1+n_2)/(n_mod-1)) * (s_matrix_3)';
+end
+%% Unified Matrix
+uni_matrix = (norm_1 + norm_2 + norm_3)/n_mod;
+save('train_uni_mat.mat','uni_matrix');
+
